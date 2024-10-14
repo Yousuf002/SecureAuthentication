@@ -16,17 +16,21 @@ def home():
     return render_template('index.html')
 
 # Registration route
+# Registration route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
+
+        print(f"Username: {username}, Email: {email}, Password: {password}")  # Debug output
+
         
         # Check if the email already exists
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
-            flash('Email address already exists. Please use a different email.', 'danger')
+            print('Email address already exists. Please use a different email.', 'danger')
             return redirect(url_for('register'))
         
         # Hash the password
@@ -34,15 +38,19 @@ def register():
 
         # Save the user
         new_user = User(username=username, email=email, password=hashed_password)
-        db.session.add(new_user)
-        db.session.commit()
         
-        flash('Registration successful! Please check your email for verification.')
-        return redirect(url_for('login'))
-    
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            print('Registration successful! Please check your email for verification.')
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()  # Rollback in case of error
+            print('An error occurred while registering. Please try again.', 'danger')
+            print(f"Error: {e}")  # Print the error for debugging
+
     return render_template('register.html')
 
-# Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
