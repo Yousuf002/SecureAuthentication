@@ -1,0 +1,17 @@
+# Ignore Python cache
+__pycache__/
+
+# Ignore virtual environment folder
+venv/
+
+# Ignore database files
+*.db
+
+# Ignore migration files
+migrations/
+
+# Ignore instance folder (often used for storing instance-specific configurations)
+instance/
+
+# Ignore other unnecessary folders
+database/
