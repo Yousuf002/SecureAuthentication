@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <title>Secure Authentication System</title>
+</head>
+<body>
+    <div class="landing-content">
+        <h1 id="heading" class="typewriter-cursor"></h1> <!-- Heading will be typed here with cursor -->
+        <p class="intro-text" id="intro-text" class="typewriter-cursor"></p> <!-- Intro text will be typed here with cursor -->
+        <div class="button-container" style="display:none;" id="button-container"> <!-- Initially hidden -->
+            <a href="{{ url_for('login') }}" class="submit-button">Login</a>
+            <a href="{{ url_for('register') }}" class="submit-button">Register</a>
+        </div>
+    </div>
+
+    <script>
+        // Typing effect function
+        function typeWriter(text, elementId, delay, callback) {
+            let i = 0;
+            let element = document.getElementById(elementId);
+            element.classList.add('typewriter-cursor'); // Add cursor when typing starts
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, delay);
+                } else {
+                    element.classList.remove('typewriter-cursor'); // Remove cursor after typing
+                    if (callback) {
+                        callback(); // Call the next function (if provided)
+                    }
+                }
+            }
+            type();
+        }
+
+        // First, type the heading, then the intro text
+        window.onload = function() {
+            typeWriter('Secure Authentication System', 'heading', 50, function() {
+                typeWriter('Your gateway to a secure and seamless experience. Please log in or register to continue.', 'intro-text', 20, function() {
+                    // Show the buttons after the text is fully typed
+                    document.getElementById('button-container').style.display = 'flex';
+                });
+            });
+        };
+    </script>
+</body> 
+</html>

@@ -1,0 +1,140 @@
+@font-face {
+    font-family: 'MyCustomFont';
+    src: url('../static/fonts/Mensrea-Regular.otf') format('truetype'); /* Adjust path based on your structure */
+    font-weight: normal;
+    font-style: normal;
+
+}
+body {
+    font-family: 'MyCustomFont', Arial, sans-serif; /* Fallback to Arial if the font fails to load */
+    margin: 0;
+    height: 100vh;
+    background-color: #000000;
+}
+body {
+    background-image: url('../static/sa7.jpg');
+    margin: 0;
+    height: 100vh;
+    background-color: #f4f4f4;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    top: 0;
+    left: 10;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+}
+
+.flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.image-container {
+    margin-top: 3px;
+}
+
+.image-container img {
+    border-radius: 0px;
+    object-fit: contain;
+    width: 100%;
+    height: 450px;
+}
+
+.container {
+    background: rgba(50, 26, 66, 0.669);
+    padding: 46px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 300px;
+    max-width: 90%;
+}
+
+h1, h2 {
+    margin-bottom: 30px;
+    color: #efefef;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+label {
+    font-size: 16px;
+    color: #d9d9d9;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.submit-button {
+    font-family: 'MyCustomFont', Arial, sans-serif; /* Apply custom font to the button */
+    padding: 10px 100px;
+    background-color: #9327ff;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.submit-button:hover {
+    background-color: #520366;
+}
+
+@media (max-width: 600px) {
+    .container {
+        width: 90%;
+    }
+}
+/* Styling for the login container and button */
+.login-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-container p {
+    color: #d9d9d9;
+    font-size: 16px;
+}
+
+.login-button {
+    padding: 10px 30px;
+    background-color: #520366;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+

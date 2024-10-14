@@ -1,0 +1,96 @@
+@font-face {
+    font-family: 'MyCustomFont';
+    src: url('../static/fonts/Mensrea-Regular.otf') format('truetype'); /* Adjust path based on your structure */
+    font-weight: normal;
+    font-style: normal;
+
+}
+body {
+    background-image: url('../static/sa7.jpg');
+    font-family: 'MyCustomFont', Arial, sans-serif; /* Fallback to Arial if the font fails to load */
+    margin: 0;
+    height: 100vh;
+    background-color: #f4f4f4;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.landing-content {
+    text-align: center;
+    color: #7c00db;
+    background: rgba(50, 26, 66, 0.47);
+    padding: 40px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+}
+
+h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #240523;
+    font-weight: 700;
+}
+
+.intro-text {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #dcdcdc;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.submit-button {
+    padding: 15px 30px;
+    background-color: #3c004b;
+    color: white;
+    text-transform: uppercase;
+    font-weight: bold;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.submit-button:hover {
+    background-color: #170125;
+}
+
+@media (max-width: 600px) {
+    .landing-content {
+        padding: 20px;
+    }
+
+    .submit-button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .button-container {
+        flex-direction: column;
+    }
+}
+
+/* Blinking typing cursor effect */
+.typewriter-cursor::after {
+    content: '|';
+    font-weight: bold;
+    margin-left: 2px;
+    animation: blink 0.7s step-start infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}

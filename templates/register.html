@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+</head>
+<body>
+    <div class="flex-container">
+        <div class="container">
+            <h2>Register</h2>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" name="password" required>
+                </div>
+                <button type="submit" class="submit-button">Register</button>
+            </form>
+
+            <!-- Added "Already have an account? Login" link/button -->
+            <div class="login-container">
+                <p>Already have an account?</p>
+                <a href="{{ url_for('login') }}" class="login-button">Login</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
