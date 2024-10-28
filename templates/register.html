@@ -1,30 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
 </head>
+
 <body>
     <div class="flex-container">
         <div class="container">
             <h2>Register</h2>
+            <!-- Flash message display -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
             <form method="POST">
                 <div class="form-group">
                     <label for="username">Username:</label>
-                    <input type="text" name="username" required>
+                    <input type="text" name="username" required pattern="[A-Za-z0-9]+" minlength="3" title="Only alphanumeric characters allowed, minimum 3 characters.">
                 </div>
                 <div class="form-group">
                     <label for="email">Email:</label>
-                    <input type="email" name="email" required>
+                    <input type="email" name="email" required title="Please enter a valid email address.">
                 </div>
                 <div class="form-group">
                     <label for="password">Password:</label>
-                    <input type="password" name="password" required>
+                    <input type="password" name="password" required minlength="8" title="Minimum 8 characters with at least one uppercase, one lowercase letter, and one number.">
                 </div>
                 <button type="submit" class="submit-button">Register</button>
             </form>
+            
 
             <!-- Added "Already have an account? Login" link/button -->
             <div class="login-container">
@@ -34,4 +48,5 @@
         </div>
     </div>
 </body>
+
 </html>

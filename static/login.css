@@ -68,6 +68,16 @@ label {
     font-size: 16px;
     color: #d9d9d9;
 }
+.flash-messages .alert {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.alert-danger { background-color: #f8d7da; color: #721c24; }
+.alert-success { background-color: #d4edda; color: #155724; }
+.alert-warning { background-color: #fff3cd; color: #856404; }
+.alert-info { background-color: #d1ecf1; color: #0c5460; }
 
 input[type="text"],
 input[type="email"],

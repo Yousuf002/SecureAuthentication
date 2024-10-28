@@ -4,6 +4,7 @@ from models import db, User
 from flask_migrate import Migrate
 from functools import wraps
 import secrets
+import re  # Importing the regex module for email validation
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
@@ -41,6 +42,19 @@ def register():
         email = request.form['email']
         password = request.form['password']
         
+        # Input validation
+        if len(username) <= 3:
+            flash('Username must be at least 4 characters long.', 'danger')
+            return redirect(url_for('register'))
+        
+        if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+            flash('Invalid email address format.', 'danger')
+            return redirect(url_for('register'))
+
+        if len(password) < 6:
+            flash('Password must be at least 6 characters long.', 'danger')
+            return redirect(url_for('register'))
+        
         # Check if the email already exists
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
@@ -60,8 +74,8 @@ def register():
             return redirect(url_for('login'))
         except Exception as e:
             db.session.rollback()
-            flash('An error occurred while registering. Please try again.', 'danger')
-            print(f"Error: {e}")
+            flash('An error occurred while registering. Please try again. Reason: ' + str(e), 'danger')
+            return redirect(url_for('register'))
 
     return render_template('register.html')
 
@@ -74,6 +88,10 @@ def login():
         
         # Fetch the user from the database
         user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            flash('Email not registered. Please sign up first.', 'warning')
+            return redirect(url_for('register'))
         
         if user and check_password_hash(user.password, password):
             # Generate a unique token for this session
