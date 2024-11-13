@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* Styles as before */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .otp-input {
+            width: 60px;
+            height: 60px;
+            font-size: 24px;
+            text-align: center;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            margin: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .otp-input:focus {
+            border-color: #4CAF50;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .input-group input {
+            margin: 0 10px;
+        }
+
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .error {
+            color: #ff4d4d;
+            margin-top: 10px;
+        }
+
+        .success {
+            color: #4CAF50;
+            margin-top: 10px;
+        }
+
+        .resend {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .resend a {
+            text-decoration: none;
+            color: #4CAF50;
+        }
+
+        .resend a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Enter OTP to Verify Your Account</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    <p>{{ message }}</p>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <div class="input-group">
+            <input type="text" name="otp1" class="otp-input" maxlength="1" required autofocus oninput="moveFocus(this, 'otp2')">
+            <input type="text" name="otp2" class="otp-input" maxlength="1" required oninput="moveFocus(this, 'otp3')">
+            <input type="text" name="otp3" class="otp-input" maxlength="1" required oninput="moveFocus(this, 'otp4')">
+            <input type="text" name="otp4" class="otp-input" maxlength="1" required oninput="moveFocus(this, 'otp5')">
+            <input type="text" name="otp5" class="otp-input" maxlength="1" required oninput="moveFocus(this, 'otp6')">
+            <input type="text" name="otp6" class="otp-input" maxlength="1" required>
+        </div>
+
+        <button type="submit" class="btn">Verify OTP</button>
+    </form>
+
+    <div class="resend">
+        <p>Didn't receive the OTP? <a href="{{ url_for('resend_otp') }}">Resend OTP</a></p>
+    </div>
+
+    {% if error %}
+        <div class="error">
+            <p>{{ error }}</p>
+        </div>
+    {% endif %}
+
+    {% if success %}
+        <div class="success">
+            <p>{{ success }}</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    // Function to move focus to the next OTP input field
+    function moveFocus(current, nextId) {
+        if (current.value.length == 1) {
+            document.getElementById(nextId).focus();
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -99,6 +99,16 @@
 </header>
 
 <section class="hero">
+     <!-- Flash message display -->
+     {% with messages = get_flashed_messages(with_categories=true) %}
+     {% if messages %}
+     <div class="flash-messages">
+         {% for category, message in messages %}
+         <div class="alert alert-{{ category }}">{{ message }}</div>
+         {% endfor %}
+     </div>
+     {% endif %}
+     {% endwith %}
     <h1>Protect Your Digital World</h1>
     <p>Comprehensive solutions for secure authentication and information protection, designed for peace of mind in a digital age.</p>
     <button style="padding: 1rem 2rem; font-size: 1rem; margin-top: 1rem;">Learn More</button>
