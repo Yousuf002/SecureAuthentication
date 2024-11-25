@@ -7,7 +7,12 @@ from functools import wraps
 import pytz  # Import pytz for timezone handling
 import secrets
 import re
-import datetime
+from datetime import datetime
+
+from itsdangerous import URLSafeTimedSerializer
+
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
 app.config.from_object('config.Config')
@@ -23,7 +28,7 @@ app.config['MAIL_DEFAULT_SENDER'] = 'yk26391@gmail.com'
 
 
 mail = Mail(app)
-
+    
 # Initialize database and migrations
 db.init_app(app)
 migrate = Migrate(app, db)
@@ -62,6 +67,19 @@ def send_otp(user_email):
 def home():
     return render_template('index.html')
 
+# Generate a confirmation token
+def generate_confirmation_token(email):
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    return serializer.dumps(email, salt=app.config['SECURITY_PASSWORD_SALT'])
+
+# Confirm the token
+def confirm_token(token, expiration=3600):  # Token expires in 1 hour
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        email = serializer.loads(token, salt=app.config['SECURITY_PASSWORD_SALT'], max_age=expiration)
+    except Exception:
+        return False
+    return email
 # Registration route
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -69,12 +87,12 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        
+
         # Input validation
         if len(username) <= 3:
             flash('Username must be at least 4 characters long.', 'danger')
             return redirect(url_for('register'))
-        
+
         if not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
             flash('Invalid email address format.', 'danger')
             return redirect(url_for('register'))
@@ -82,53 +100,126 @@ def register():
         if len(password) < 6:
             flash('Password must be at least 6 characters long.', 'danger')
             return redirect(url_for('register'))
-        
+
+        # Check for at least one capital letter and one special character
+        if not re.search(r'[A-Z]', password):
+            flash('Password must contain at least one uppercase letter.', 'danger')
+            return redirect(url_for('register'))
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            flash('Password must contain at least one special character.', 'danger')
+            return redirect(url_for('register'))
+
         # Check if the email already exists
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             flash('Email address already exists. Please use a different email.', 'danger')
             return redirect(url_for('register'))
-        
+
         # Hash the password
         hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
+        # Generate verification token
+        verification_token = secrets.token_hex(16)
+
         # Save the user
-        new_user = User(username=username, email=email, password=hashed_password)
-        
+        new_user = User(
+            username=username,
+            email=email,
+            password=hashed_password,
+            email_verification_token=verification_token,
+            email_verification_sent_at=datetime.utcnow()
+        )
+
         try:
             db.session.add(new_user)
             db.session.commit()
-            flash('Registration successful! Please check your email for verification.', 'success')
+
+            # Send verification email
+            send_verification_email(email, verification_token)
+
             return redirect(url_for('login'))
         except Exception as e:
             db.session.rollback()
-            flash('An error occurred while registering. Please try again. Reason: ' + str(e), 'danger')
+            flash(f'An error occurred while registering: {e}', 'danger')
             return redirect(url_for('register'))
 
     return render_template('register.html')
 
-# Login route
+def send_verification_email(email, token):
+    verification_link = url_for('verify_email', token=token, _external=True)
+    msg = Message(
+        "Email Verification - Your App",
+        recipients=[email],
+        body=f"Please click the following link to verify your email address:\n\n{verification_link}\n\nIf you did not register, please ignore this email."
+    )
+    try:
+        mail.send(msg)
+        flash('Verification email sent. Please check your inbox.', 'info')
+    except Exception as e:
+        flash(f'Failed to send verification email: {e}', 'danger')
+@app.route('/verify_email/<token>', methods=['GET'])
+def verify_email(token):
+    user = User.query.filter_by(email_verification_token=token).first()
+
+    if not user:
+        flash('Invalid or expired verification link.', 'danger')
+        return redirect(url_for('register'))
+
+   
+    user.is_verified = True
+    user.email_verification_token = None 
+    user.email_verification_sent_at = None
+    db.session.commit()
+
+    flash('Email verified successfully! You can now log in.', 'success')
+    return redirect(url_for('login'))
+
+@app.route('/confirm/<token>')
+def confirm_email(token):
+    try:
+        email = confirm_token(token)
+    except:
+        flash('The confirmation link is invalid or has expired.', 'danger')
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(email=email).first_or_404()
+
+    if user.email_verified:
+        flash('Account already confirmed. Please log in.', 'success')
+    else:
+        user.email_verified = True
+        db.session.commit()
+        flash('Your email has been confirmed. Thank you!', 'success')
+
+    return redirect(url_for('login'))
+
+# Initialize Flask-Limiter
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["200 per day", "10 per hour"] 
+)
+
 @app.route('/login', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")  # Limit to 5 login attempts per minute
 def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        
-        # Fetch the user from the database
         user = User.query.filter_by(email=email).first()
-        
+
         if not user:
             flash('Email not registered. Please sign up first.', 'warning')
             return redirect(url_for('login'))
-        
+
+        if not user.is_verified:
+            flash('Your email is not verified. Please verify your email first.', 'danger')
+            return redirect(url_for('login'))
+
         if user and check_password_hash(user.password, password):
-            # Generate a unique token for this session
             session['user_token'] = secrets.token_hex(16)
             session['user_id'] = user.id
-            send_otp(user.email)  # Send OTP after login
-
-            return redirect(url_for('verify_otp'))  # Redirect to OTP verification page
-        
+            return redirect(url_for('sample'))
         else:
             flash('Invalid email or password. Please try again.', 'danger')
             return redirect(url_for('login'))
